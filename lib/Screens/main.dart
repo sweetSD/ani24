@@ -63,7 +63,7 @@ class MainPageState extends State<MainPage> {
     final divider = Divider(color: ani24_text_grey, height: 2,);
     
     Widget buildTab(String text) {
-      return Padding(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 12), child: Text(text),);
+      return Padding(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 24), child: Text(text),);
     }
 
     ListView buildAnimeListView(int day) {
@@ -100,7 +100,7 @@ class MainPageState extends State<MainPage> {
                       buildTab("일"),
                     ],
                   ),
-                  title: Image.asset('assets/image/main_logo.png', width: 100, height: 50,),
+                  title: Image.asset('assets/image/main_logo.png', width: 120, height: 30,),
                 ),
                 body: TabBarView(
                   children: <Widget>[
@@ -116,18 +116,7 @@ class MainPageState extends State<MainPage> {
               );
             } else {
               return Scaffold(
-                body: Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      CircularProgressIndicator(),
-                      Space(30),
-                      Text("로딩중입니다.."),
-                  ],),
-                ),
+                body: LoadingIndicator()
               );
             }
         },),
