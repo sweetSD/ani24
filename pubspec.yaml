@@ -82,3 +82,13 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+fonts:
+  - family: NotoSans
+    fonts:
+      - asset: assets/font/NotoSansKR-Thin.otf
+      - asset: assets/font/NotoSansKR-Light.otf
+      - asset: assets/font/NotoSansKR-Regular.otf
+      - asset: assets/font/NotoSansKR-Medium.otf
+      - asset: assets/font/NotoSansKR-Bold.otf
+      - asset: assets/font/NotoSansKR-Black.otf

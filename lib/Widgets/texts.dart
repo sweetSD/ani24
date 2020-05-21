@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const Color ani24_text_blue = Color(0xff1f60ee);
-const Color ani24_text_black = Color(0xff787980);
+const Color ani24_text_black = Color(0xff333333);
 const Color ani24_text_red = Color(0xfffb4949);
-const Color ani24_text_grey = Color(0xff5f6368);
+const Color ani24_text_grey = Color(0xff777777);
+const Color ani24_background_grey = Color(0xffefefef);
 
 enum TextType {
   Light,
@@ -43,24 +44,28 @@ class CustomText extends StatelessWidget {
   final TextOverflow overflow;
   final double scaleFactor;
   final int maxLines;
+  final Color color;
+  final String fontFamily;
 
   CustomText(
     this.data, 
   {
     this.type = TextType.Regular,
     this.size = 14,
-    this.style = const TextStyle(color: ani24_text_black), 
+    this.style = const TextStyle(), 
     this.align, 
     this.direction, 
     this.overflow, 
     this.scaleFactor, 
-    this.maxLines
+    this.maxLines,
+    this.color = ani24_text_black,
+    this.fontFamily,
   });
 
   @override
   Widget build(BuildContext context) {
     return Text(data,
-      style: style.copyWith(fontSize: size, fontWeight: getFontWeight(type)),
+      style: style.copyWith(fontSize: size, fontWeight: getFontWeight(type), color: color, fontFamily: fontFamily),
       textAlign: align,
       textDirection: direction,
       overflow: overflow,

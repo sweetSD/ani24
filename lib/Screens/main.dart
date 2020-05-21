@@ -1,3 +1,4 @@
+import 'package:ani24/Data/constants.dart';
 import 'package:ani24/Data/data.dart';
 import 'package:ani24/Widgets/texts.dart';
 import 'package:ani24/Widgets/widgets.dart';
@@ -16,18 +17,17 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> {
 
   // 참고 : https://idlecomputer.tistory.com/326
-  final AsyncMemoizer memoizer = AsyncMemoizer();
+  final AsyncMemoizer memorizer = AsyncMemoizer();
 
-  final String baseUrl = 'https://ani24do.com';
   String html = "";
 
   List<List<dom.Element>> main_anis = List<List<dom.Element>>();
   List<List<AnimationInfo>> main_ani_infoes = List<List<AnimationInfo>>();
 
   getData() async {
-    return memoizer.runOnce(() async {
+    return memorizer.runOnce(() async {
       // 사이트 html을 긁어와 애니 목록을 가져옵니다.
-      http.Response response = await http.get(baseUrl);
+      http.Response response = await http.get(baseurl);
       dom.Document document = parser.parse(response.body);
       List<dom.Element> main_ani_container = document.getElementsByClassName('main_ani_list');
       List<dom.Element> main_ani_lists = main_ani_container[0].children.where((element) => element.className.contains('main_ani_day_list')).toList();
@@ -46,7 +46,7 @@ class MainPageState extends State<MainPage> {
         element.forEach((dom.Element _element) { 
           main_ani_infoes[index].add(AnimationInfo(
             _element.children[0].attributes['style'].split('(')[1].replaceAll(')', ''), 
-            baseUrl + _element.children[0].attributes['href'], 
+            baseurl + _element.children[0].attributes['href'], 
             _element.children[1 + (_element.children.length == 4 ? 1 : 0)].text, 
             _element.children[2 + (_element.children.length == 4 ? 1 : 0)].text));
         });
