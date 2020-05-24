@@ -22,7 +22,7 @@ class MainPageState extends State<MainPage> {
   String html = "";
 
   List<List<dom.Element>> main_anis = List<List<dom.Element>>();
-  List<List<AnimationInfo>> main_ani_infoes = List<List<AnimationInfo>>();
+  List<List<AnimationData>> main_ani_infoes = List<List<AnimationData>>();
 
   getData() async {
     return memorizer.runOnce(() async {
@@ -36,7 +36,7 @@ class MainPageState extends State<MainPage> {
       main_ani_infoes.clear();
       // 애니 리스트 월, 화, 수, 목, 금, 토, 일
       for(int i = 0;i < 7;i++) {
-        main_ani_infoes.add(List<AnimationInfo>());
+        main_ani_infoes.add(List<AnimationData>());
         main_anis.add(main_ani_lists[i].children);
       }
 
@@ -44,7 +44,7 @@ class MainPageState extends State<MainPage> {
       // Element의 firstChild와 children[0]은 다름.
       main_anis.forEach((List<dom.Element> element) {
         element.forEach((dom.Element _element) { 
-          main_ani_infoes[index].add(AnimationInfo(
+          main_ani_infoes[index].add(AnimationData(
             _element.children[0].attributes['style'].split('(')[1].replaceAll(')', ''), 
             baseurl + _element.children[0].attributes['href'], 
             _element.children[1 + (_element.children.length == 4 ? 1 : 0)].text, 
@@ -68,11 +68,13 @@ class MainPageState extends State<MainPage> {
 
     ListView buildAnimeListView(int day) {
       return ListView.separated(
-                itemBuilder: (context, index) {
-                  return AnimationCard(main_ani_infoes[day][index]);
-                }, separatorBuilder: (context, index) {
-                  return divider;
-                }, itemCount: main_ani_infoes[day].length);
+        physics: BouncingScrollPhysics(),
+        itemBuilder: (context, index) {
+          return AnimationCard(main_ani_infoes[day][index]);
+        }, separatorBuilder: (context, index) {
+          return Space(10);
+        }, itemCount: main_ani_infoes[day].length
+      );
     }
 
     return MaterialApp(

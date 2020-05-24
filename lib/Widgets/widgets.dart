@@ -1,9 +1,19 @@
+import 'package:ani24/Data/constants.dart';
 import 'package:ani24/Data/data.dart';
 import 'package:ani24/Screens/overview.dart';
 import 'package:ani24/Widgets/texts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+AppBar getAni24Appbar() {
+  return AppBar(
+    centerTitle: true,
+    backgroundColor: Colors.white,
+    title: Image.asset('assets/image/main_logo.png', width: 120, height: 30,),
+    iconTheme: IconThemeData(color: Colors.black),
+  );
+}
 
 class Space extends StatelessWidget {
   final double size;
@@ -18,7 +28,7 @@ class Space extends StatelessWidget {
 
 class AnimationCard extends StatelessWidget {
 
-  final AnimationInfo animation;
+  final AnimationData animation;
 
   const AnimationCard(this.animation);
 
@@ -32,6 +42,7 @@ class AnimationCard extends StatelessWidget {
     }
 
     return Container(
+      decoration: roundBoxDecoration(),
       child: InkWell(
         onTap: navigateToOverviewPage,
         child: Row(
@@ -39,6 +50,7 @@ class AnimationCard extends StatelessWidget {
             Container(
               width: size.width * 0.3,
               height: size.height * 0.21,
+              padding: EdgeInsets.symmetric(horizontal: size.height * 0.005, vertical: size.height * 0.01),
               child: CachedNetworkImage(
                 // (animation.thumbUrl.startsWith('//') ? 'https:' : '') + animation.thumbUrl
                 imageUrl: 'https:' + animation.thumbUrl,
@@ -52,9 +64,9 @@ class AnimationCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CustomText(animation.title, size: 20, type: TextType.ExtraBold,),
+                    CustomText(animation.title, size: 20,),
                     Space(20),
-                    CustomText(animation.genre, style: TextStyle(color: ani24_text_blue),)
+                    CustomText(animation.genre, color: ani24_text_blue,)
               ],)
               ,)
             ,),
