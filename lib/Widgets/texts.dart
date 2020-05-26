@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const Color ani24_text_blue = Color(0xff1f60ee);
 const Color ani24_text_black = Color(0xff333333);
@@ -65,7 +66,7 @@ class CustomText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(data,
-      style: style.copyWith(fontSize: size, fontWeight: getFontWeight(type), color: color, fontFamily: fontFamily),
+      style: style.copyWith(fontSize: size * ScreenUtil.textScaleFactor, fontWeight: getFontWeight(type), color: color, fontFamily: fontFamily),
       textAlign: align,
       textDirection: direction,
       overflow: overflow,

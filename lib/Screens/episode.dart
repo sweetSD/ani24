@@ -3,10 +3,12 @@ import 'package:ani24/Data/constants.dart';
 import 'package:ani24/Data/data.dart';
 import 'package:ani24/Data/parser.dart';
 import 'package:ani24/Widgets/texts.dart';
+import 'package:ani24/Widgets/video.dart';
 import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ani24/Widgets/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
@@ -29,7 +31,9 @@ class EpisodePageState extends State<EpisodePage> {
 
   final AsyncMemoizer memorizer = AsyncMemoizer();
 
-  VideoPlayerController controller;
+  bool isRotated = false;
+
+  Ani24VideoPlayer player;
 
   getData() async {
     return memorizer.runOnce(() async {
@@ -56,9 +60,19 @@ class EpisodePageState extends State<EpisodePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIOverlays([]);
+
+    player = Ani24VideoPlayer(
+      'https://utrfghbvndf.com/a/' + episodeData.episodeId + '.jpg', 
+      width: MediaQuery.of(context).size.width - 24,
+      height: (MediaQuery.of(context).size.width - 24) * 0.65,);
+  }
+
+  @override
   void dispose() {
-    if(controller != null)
-      controller.dispose();
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -87,17 +101,23 @@ class EpisodePageState extends State<EpisodePage> {
     getVideoWebViewContainer() => Container(
       width: MediaQuery.of(context).size.width - 24,
       height: (MediaQuery.of(context).size.width - 24) * 0.65,
-      padding: EdgeInsets.only(top: 12),
       alignment: Alignment.centerLeft,
-      decoration: roundBoxDecoration(),
-      child: getVideoWebView()
-      //VideoPlayer(controller),
-      
+      child: //getVideoWebView()
+      player
     );
 
-    return OrientationBuilder(
-      builder: (context, orientation) => Scaffold(
-        appBar:  orientation == Orientation.portrait ? getAni24Appbar() : null,
+    if(isRotated) {
+      player.width = MediaQuery.of(context).size.width - 24;
+      player.height = (MediaQuery.of(context).size.width - 24) * 0.65;
+    } else {
+      player.width = double.infinity;
+      player.height = double.infinity;
+    }
+
+    return WillPopScope(
+      child: Scaffold(
+        resizeToAvoidBottomPadding: false,
+        appBar:  !isRotated ? getAni24Appbar() : null,
         body: FutureBuilder(
           future: getData(),
           builder: (context, snapshot) {
@@ -106,7 +126,7 @@ class EpisodePageState extends State<EpisodePage> {
             if(!snapshot.hasData)
               return LoadingIndicator();
             else {
-              return orientation == Orientation.portrait ? SingleChildScrollView(
+              return !isRotated ? SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 physics: BouncingScrollPhysics(),
                 child: 
@@ -116,19 +136,36 @@ class EpisodePageState extends State<EpisodePage> {
                     Space(20),
                     FadeInOffset(offset: Offset(0, 50), child: title,),
                     Space(20),
-                    FadeInOffset(offset: Offset(0, 50), child: getVideoWebViewContainer(),)
+                    FadeInOffset(offset: Offset(0, 50), child: player,),
+                    IconButton(icon: Icon(Icons.rotate_90_degrees_ccw), onPressed: () {setState(() {
+                      isRotated = true;
+                    });},),
                   ],
                 )
               )
-              : Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: getVideoWebView(),
+              : RotatedBox(
+                quarterTurns: 45,
+                child: Container(
+                  width: MediaQuery.of(context).size.height,
+                  height: MediaQuery.of(context).size.width,
+                  child: player,
+                ),
               );
             }
           },
         ),
       ),
+      onWillPop: () {
+        if(isRotated) {
+          setState(() {
+            isRotated = false;
+          });
+          return Future<bool>.value(false);
+        }
+        else {
+          return Future<bool>.value(true);
+        }
+      },
     );
   }
 }

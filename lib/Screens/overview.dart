@@ -185,7 +185,7 @@ class OverviewPageState extends State<OverviewPage> {
           Navigator.push(context, MaterialPageRoute(builder: (context) => EpisodePage(data),));
         },
         child: Container(
-          height: 130,
+          height: MediaQuery.of(context).size.height * 0.13,
           width: double.infinity,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -222,13 +222,14 @@ class OverviewPageState extends State<OverviewPage> {
           itemBuilder: (context, index) {
             return getEpisode(overviewData.episodes[index]);
           },
-          separatorBuilder: (context, index) => Container(child: Divider(height: 1, thickness: 1, color: ani24_text_grey,), height: 10,),
+          separatorBuilder: (context, index) => Container(child: Divider(height: 1, thickness: 1, color: ani24_background_grey,),),
           itemCount: overviewData.episodes.length,
         )
       );
     }
 
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       backgroundColor: ani24_background_grey,
       appBar: getAni24Appbar(),
       body: FutureBuilder(

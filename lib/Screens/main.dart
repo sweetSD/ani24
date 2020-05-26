@@ -5,6 +5,7 @@ import 'package:ani24/Widgets/widgets.dart';
 import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
@@ -61,6 +62,8 @@ class MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
 
     final divider = Divider(color: ani24_text_grey, height: 2,);
+
+    ScreenUtil.init(context);
     
     Widget buildTab(String text) {
       return Padding(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 24), child: Text(text),);
@@ -85,6 +88,7 @@ class MainPageState extends State<MainPage> {
           builder: (context, snapshot) {
             if(snapshot.hasData) {
               return Scaffold(
+                resizeToAvoidBottomPadding: false,
                 appBar: AppBar(
                   centerTitle: true,
                   backgroundColor: Colors.white,
@@ -118,6 +122,7 @@ class MainPageState extends State<MainPage> {
               );
             } else {
               return Scaffold(
+                resizeToAvoidBottomPadding: false,
                 body: LoadingIndicator()
               );
             }
