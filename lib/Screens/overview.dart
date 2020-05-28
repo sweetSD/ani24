@@ -8,6 +8,7 @@ import 'package:async/async.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
@@ -33,7 +34,15 @@ class OverviewPageState extends State<OverviewPage> {
 
   getData() async {
     return memorizer.runOnce(() async {
-      http.Response response = await http.get(widget.animation.pageUrl);
+      http.Response response;
+      try {
+        response = await http.get(widget.animation.pageUrl).timeout(Duration(seconds: 10));
+      }
+      catch (e) {
+        Navigator.pop(context);
+        Fluttertoast.showToast(msg: '오류가 발생했습니다. 다시 시도해주세요.');
+        return Future.value(null);
+      }
       dom.Document document = parser.parse(response.body);
 
       final ani_info_right = document.getElementsByClassName('ani_info_right_box')[0];

@@ -63,7 +63,7 @@ class MainPageState extends State<MainPage> {
 
     final divider = Divider(color: ani24_text_grey, height: 2,);
 
-    ScreenUtil.init(context);
+    ScreenUtil.init(context, width: 540, height: 960, allowFontScaling: true);
     
     Widget buildTab(String text) {
       return Padding(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 24), child: Text(text),);

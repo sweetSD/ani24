@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ani24/Widgets/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
@@ -37,7 +38,16 @@ class EpisodePageState extends State<EpisodePage> {
 
   getData() async {
     return memorizer.runOnce(() async {
-      http.Response response = await http.get(widget.animationEpisodeData.pageUrl);
+      http.Response response;
+      try {
+        response = await http.get(widget.animationEpisodeData.pageUrl).timeout(Duration(seconds: 10));
+      }
+      catch (e) {
+        Navigator.pop(context);
+        Fluttertoast.showToast(msg: '오류가 발생했습니다. 다시 시도해주세요.');
+        return Future.value(null);
+      }
+
       dom.Document document = parser.parse(response.body);
 
       var view_info_box = document.getElementsByClassName('view_info_box')[0];
@@ -48,12 +58,10 @@ class EpisodePageState extends State<EpisodePage> {
         getEpisodeIdFromUrl(widget.animationEpisodeData.pageUrl),
       );
 
-      // controller = VideoPlayerController.network('https://utrfghbvndf.com/a/' + episodeData.episodeId + '.jpg');
-      // controller.addListener(() {
-      //   setState(() {});
-      // });
-      // controller.initialize();
-      // controller.play();
+      player = Ani24VideoPlayer(
+        'https://utrfghbvndf.com/a/' + episodeData.episodeId + '.jpg', 
+        width: MediaQuery.of(context).size.width - 24,
+        height: (MediaQuery.of(context).size.width - 24) * 0.65,);
 
       return episodeData;
     });
@@ -63,11 +71,6 @@ class EpisodePageState extends State<EpisodePage> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIOverlays([]);
-
-    player = Ani24VideoPlayer(
-      'https://utrfghbvndf.com/a/' + episodeData.episodeId + '.jpg', 
-      width: MediaQuery.of(context).size.width - 24,
-      height: (MediaQuery.of(context).size.width - 24) * 0.65,);
   }
 
   @override
@@ -106,12 +109,12 @@ class EpisodePageState extends State<EpisodePage> {
       player
     );
 
-    if(isRotated) {
-      player.width = MediaQuery.of(context).size.width - 24;
-      player.height = (MediaQuery.of(context).size.width - 24) * 0.65;
-    } else {
+    if(isRotated && player != null) {
       player.width = double.infinity;
       player.height = double.infinity;
+    } else if (player != null) {
+      player.width = MediaQuery.of(context).size.width - 24;
+      player.height = (MediaQuery.of(context).size.width - 24) * 0.65;
     }
 
     return WillPopScope(

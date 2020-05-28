@@ -14,9 +14,15 @@ class Ani24VideoPlayer extends StatefulWidget {
   Ani24VideoPlayerState createState() => Ani24VideoPlayerState();
 }
 
-class Ani24VideoPlayerState extends State<Ani24VideoPlayer> {
+class Ani24VideoPlayerState extends State<Ani24VideoPlayer> with SingleTickerProviderStateMixin{
 
   VideoPlayerController _controller;
+
+  AnimationController _animController;
+  Animation<double> _fadeAnimation;
+
+  int length = 0;
+  int position = 0;
 
   @override
   void initState() {
@@ -26,6 +32,9 @@ class Ani24VideoPlayerState extends State<Ani24VideoPlayer> {
         setState(() {});
       });
       _controller.initialize();
+
+      _animController = AnimationController(vsync: this, duration: Duration(seconds: 1));
+      _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_animController);
   }
 
   @override
@@ -42,8 +51,22 @@ class Ani24VideoPlayerState extends State<Ani24VideoPlayer> {
     _controller.pause();
   }
 
+  void forward(int sec) async {
+    _controller.seekTo(await _controller.position + Duration(seconds: 10));
+  }
+
+  void rewind(int sec) async {
+    _controller.seekTo(await _controller.position - Duration(seconds: 10));
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    if (_controller.value.initialized) {
+      length = _controller.value.duration.inSeconds;
+      _controller.position.then((value) => position = value.inSeconds);
+    }
+
     return Container(
       width: widget.width,
       height: widget.height,
@@ -54,22 +77,73 @@ class Ani24VideoPlayerState extends State<Ani24VideoPlayer> {
             aspectRatio: _controller.value.aspectRatio,
             child: VideoPlayer(_controller),
           ),
-          Center(
-            child: InkWell(
-              onTap: () {
-                if(_controller.value.isPlaying)
-                  pause();
-                else
-                  play();
-              },
-              child: Container(
-                width: 50,
-                height: 50,
-                child: Icon(
-                  _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Slider(
+                  value: position.toDouble(),
+                  min: 0,
+                  max: length.toDouble(),
+                  onChangeStart: (value) {
+
+                  },
+                  onChanged: (value) {
+
+                  },
+                  onChangeEnd: (value) {
+                    _controller.seekTo(Duration(seconds: value.toInt()));
+                  },
                 ),
-              ),
-            )
+                Row(
+                  children: <Widget>[
+                    // Play . Pause Button
+                    InkWell(
+                      onTap: () {
+                        if(_controller.value.isPlaying)
+                          pause();
+                        else
+                          play();
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        child: Icon(
+                          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                        ),
+                      ),
+                    ),
+
+                    // Rewind 10 sec..
+                    InkWell(
+                      onTap: () {
+                        rewind(10);
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        child: Icon(Icons.fast_rewind),
+                      ),
+                    ),
+
+                    // Forward 10 sec..
+                    InkWell(
+                      onTap: () {
+                        forward(10);
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        child: Icon(Icons.fast_forward),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ],
       ),

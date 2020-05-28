@@ -66,7 +66,7 @@ class CustomText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(data,
-      style: style.copyWith(fontSize: size * ScreenUtil.textScaleFactor, fontWeight: getFontWeight(type), color: color, fontFamily: fontFamily),
+      style: style.copyWith(fontSize: size, fontWeight: getFontWeight(type), color: color, fontFamily: fontFamily),
       textAlign: align,
       textDirection: direction,
       overflow: overflow,
