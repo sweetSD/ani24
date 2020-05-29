@@ -49,7 +49,9 @@ class MainPageState extends State<MainPage> {
             _element.children[0].attributes['style'].split('(')[1].replaceAll(')', ''), 
             baseurl + _element.children[0].attributes['href'], 
             _element.children[1 + (_element.children.length == 4 ? 1 : 0)].text, 
-            _element.children[2 + (_element.children.length == 4 ? 1 : 0)].text));
+            _element.children[2 + (_element.children.length == 4 ? 1 : 0)].text,
+            _element.children.length == 4,
+            ));
         });
         index++;
       });

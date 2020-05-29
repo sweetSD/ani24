@@ -5,8 +5,9 @@ class AnimationData {
   final String pageUrl;
   final String title;
   final String genre;
+  final bool isUp;
 
-  const AnimationData(this.thumbUrl, this.pageUrl, this.title, this.genre);
+  const AnimationData(this.thumbUrl, this.pageUrl, this.title, this.genre, [this.isUp = false]);
 }
 
 // 애니메이션 개요 보기 페이지에 필요한 데이터 클래스

@@ -1,3 +1,4 @@
+import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -17,6 +18,7 @@ class Ani24VideoPlayer extends StatefulWidget {
 class Ani24VideoPlayerState extends State<Ani24VideoPlayer> with SingleTickerProviderStateMixin{
 
   VideoPlayerController _controller;
+  ChewieController _chewieController;
 
   AnimationController _animController;
   Animation<double> _fadeAnimation;
@@ -31,7 +33,12 @@ class Ani24VideoPlayerState extends State<Ani24VideoPlayer> with SingleTickerPro
       _controller.addListener(() {
         setState(() {});
       });
-      _controller.initialize();
+      _controller.initialize().then((value) {
+        _chewieController = ChewieController(
+          videoPlayerController: _controller,
+          aspectRatio: _controller.value.aspectRatio,
+        );
+      });
 
       _animController = AnimationController(vsync: this, duration: Duration(seconds: 1));
       _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_animController);
@@ -41,6 +48,7 @@ class Ani24VideoPlayerState extends State<Ani24VideoPlayer> with SingleTickerPro
   void dispose() {
     super.dispose();
     _controller.dispose();
+    _chewieController.dispose();
   }
 
   void play() {
@@ -73,78 +81,80 @@ class Ani24VideoPlayerState extends State<Ani24VideoPlayer> with SingleTickerPro
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          ),
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Slider(
-                  value: position.toDouble(),
-                  min: 0,
-                  max: length.toDouble(),
-                  onChangeStart: (value) {
+          if(_chewieController != null)
+            Chewie(controller: _chewieController,),
+          // AspectRatio(
+          //   aspectRatio: _controller.value.aspectRatio,
+          //   child: VideoPlayer(_controller),
+          // ),
+          // Container(
+          //   width: double.infinity,
+          //   height: double.infinity,
+          //   alignment: Alignment.bottomCenter,
+          //   child: Column(
+          //     mainAxisAlignment: MainAxisAlignment.end,
+          //     children: <Widget>[
+          //       Slider(
+          //         value: position.toDouble(),
+          //         min: 0,
+          //         max: length.toDouble(),
+          //         onChangeStart: (value) {
 
-                  },
-                  onChanged: (value) {
+          //         },
+          //         onChanged: (value) {
 
-                  },
-                  onChangeEnd: (value) {
-                    _controller.seekTo(Duration(seconds: value.toInt()));
-                  },
-                ),
-                Row(
-                  children: <Widget>[
-                    // Play . Pause Button
-                    InkWell(
-                      onTap: () {
-                        if(_controller.value.isPlaying)
-                          pause();
-                        else
-                          play();
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        child: Icon(
-                          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-                        ),
-                      ),
-                    ),
+          //         },
+          //         onChangeEnd: (value) {
+          //           _controller.seekTo(Duration(seconds: value.toInt()));
+          //         },
+          //       ),
+          //       Row(
+          //         children: <Widget>[
+          //           // Play . Pause Button
+          //           InkWell(
+          //             onTap: () {
+          //               if(_controller.value.isPlaying)
+          //                 pause();
+          //               else
+          //                 play();
+          //             },
+          //             child: Container(
+          //               width: 50,
+          //               height: 50,
+          //               child: Icon(
+          //                 _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          //               ),
+          //             ),
+          //           ),
 
-                    // Rewind 10 sec..
-                    InkWell(
-                      onTap: () {
-                        rewind(10);
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        child: Icon(Icons.fast_rewind),
-                      ),
-                    ),
+          //           // Rewind 10 sec..
+          //           InkWell(
+          //             onTap: () {
+          //               rewind(10);
+          //             },
+          //             child: Container(
+          //               width: 50,
+          //               height: 50,
+          //               child: Icon(Icons.fast_rewind),
+          //             ),
+          //           ),
 
-                    // Forward 10 sec..
-                    InkWell(
-                      onTap: () {
-                        forward(10);
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        child: Icon(Icons.fast_forward),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
+          //           // Forward 10 sec..
+          //           InkWell(
+          //             onTap: () {
+          //               forward(10);
+          //             },
+          //             child: Container(
+          //               width: 50,
+          //               height: 50,
+          //               child: Icon(Icons.fast_forward),
+          //             ),
+          //           ),
+          //         ],
+          //       )
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

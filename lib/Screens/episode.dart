@@ -68,18 +68,6 @@ class EpisodePageState extends State<EpisodePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    SystemChrome.setEnabledSystemUIOverlays([]);
-  }
-
-  @override
-  void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     
     final title = Container(
@@ -129,7 +117,7 @@ class EpisodePageState extends State<EpisodePage> {
             if(!snapshot.hasData)
               return LoadingIndicator();
             else {
-              return !isRotated ? SingleChildScrollView(
+              return SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 physics: BouncingScrollPhysics(),
                 child: 
@@ -140,34 +128,15 @@ class EpisodePageState extends State<EpisodePage> {
                     FadeInOffset(offset: Offset(0, 50), child: title,),
                     Space(20),
                     FadeInOffset(offset: Offset(0, 50), child: player,),
-                    IconButton(icon: Icon(Icons.rotate_90_degrees_ccw), onPressed: () {setState(() {
-                      isRotated = true;
-                    });},),
                   ],
                 )
-              )
-              : RotatedBox(
-                quarterTurns: 45,
-                child: Container(
-                  width: MediaQuery.of(context).size.height,
-                  height: MediaQuery.of(context).size.width,
-                  child: player,
-                ),
               );
             }
           },
         ),
       ),
       onWillPop: () {
-        if(isRotated) {
-          setState(() {
-            isRotated = false;
-          });
-          return Future<bool>.value(false);
-        }
-        else {
-          return Future<bool>.value(true);
-        }
+        return Future<bool>.value(true);
       },
     );
   }

@@ -51,11 +51,26 @@ class AnimationCard extends StatelessWidget {
               width: size.width * 0.3,
               height: size.height * 0.21,
               padding: EdgeInsets.symmetric(horizontal: size.height * 0.005, vertical: size.height * 0.01),
-              child: CachedNetworkImage(
-                // (animation.thumbUrl.startsWith('//') ? 'https:' : '') + animation.thumbUrl
-                imageUrl: 'https:' + animation.thumbUrl,
-                placeholder: (context, url) => Padding(padding: EdgeInsets.symmetric(horizontal: size.height * 0.05, vertical: size.height * 0.078), child: CircularProgressIndicator(),),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+              child: Stack(
+                children: <Widget>[
+                  CachedNetworkImage(
+                    // (animation.thumbUrl.startsWith('//') ? 'https:' : '') + animation.thumbUrl
+                    imageUrl: 'https:' + animation.thumbUrl,
+                    placeholder: (context, url) => Padding(padding: EdgeInsets.symmetric(horizontal: size.height * 0.05, vertical: size.height * 0.078), child: CircularProgressIndicator(),),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
+                  if(animation.isUp)
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: size.width * 0.06,
+                        height: size.width * 0.06,
+                        color: Color(0xfffb4949),
+                        child: CustomText('UP', color: Colors.white, size: 16,),
+                      ),
+                    )
+                ],
               ),
             ),
             Expanded(
