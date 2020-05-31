@@ -8,6 +8,7 @@ import 'package:async/async.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
@@ -35,39 +36,41 @@ class OverviewPageState extends State<OverviewPage> {
   getData() async {
     return memorizer.runOnce(() async {
       http.Response response;
-      try {
-        response = await http.get(widget.animation.pageUrl).timeout(Duration(seconds: 10));
-      }
-      catch (e) {
-        Navigator.pop(context);
-        Fluttertoast.showToast(msg: '오류가 발생했습니다. 다시 시도해주세요.');
-        return Future.value(null);
+      while(response == null) {
+        try {
+          response = await http.get(widget.animation.pageUrl).timeout(Duration(seconds: 10));
+        }
+        catch (e) {
+          Navigator.pop(context);
+          Fluttertoast.showToast(msg: '오류가 발생했습니다. 다시 시도해주세요.');
+          return Future.value(null);
+        }
       }
       dom.Document document = parser.parse(response.body);
 
-      final ani_info_right = document.getElementsByClassName('ani_info_right_box')[0];
-      final ani_info_lines = document.getElementsByClassName('ani_info_right_box')[0].getElementsByClassName('info_line');
+      final ani_info_right = document.getElementsByClassName('ani_info_right_box');
+      final ani_info_lines = ani_info_right.length > 0 ? document.getElementsByClassName('ani_info_right_box')[0].getElementsByClassName('info_line') : null;
       final ani_video_list = document.getElementsByClassName('ani_video_list')[0];
 
       overviewData = AnimationOverview(
         document.getElementsByClassName('ani_info_title_font_box')[0].text,
-        'https:' + document.getElementsByClassName('ani_info_left_box')[0].children[0].attributes['src'],
-        double.parse(document.getElementsByClassName('score_block_right')[0].text),
-        ani_info_lines[0].children[1].text,
-        ani_info_lines[1].children[1].text,
-        ani_info_lines[2].children[1].text,
-        ani_info_lines[3].children[1].text,
-        ani_info_lines[4].children[1].text,
-        ani_info_lines[5].children[1].text,
-        ani_info_lines[6].children[1].text,
-        ani_info_lines[7].children[1].text,
-        ani_info_lines[8].children[1].text,
-        ani_info_lines[9].children[1].text,
-        ani_info_lines[10].children[1].text,
-        ani_info_lines[11].children[1].text,
-        ani_info_lines[12].children[1].text,
+        document.getElementsByClassName('ani_info_left_box').length > 0 ? ('https:' + document.getElementsByClassName('ani_info_left_box')[0].children[0].attributes['src']) : '',
+        document.getElementsByClassName('score_block_right').length > 0 ? double.parse(document.getElementsByClassName('score_block_right')[0].text) : 0,
+        ani_info_lines != null ? ani_info_lines[0].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[1].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[2].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[3].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[4].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[5].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[6].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[7].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[8].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[9].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[10].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[11].children[1].text : '-',
+        ani_info_lines != null ? ani_info_lines[12].children[1].text : '-',
         ani_video_list.children.map((e) {
-          return AnimationEpisodeData('https:' + e.children[0].children[0].attributes['src'], e.children[1].children[0].text, DateTime.parse(e.children[1].children[1].text), baseurl + e.attributes['href']);
+          return AnimationEpisodeData('https:' + e.children[0].children[0].attributes['src'], e.children[1].children[0].text, e.children[1].children[1].text, baseurl + e.attributes['href']);
         }).toList(),
 
       );
@@ -122,12 +125,33 @@ class OverviewPageState extends State<OverviewPage> {
       );
     }
 
-    final rating = Container(
+    getRating() => Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           CustomText('평균 평점', align: TextAlign.left,),
-          CustomText('4.3', align: TextAlign.right,),
+          Expanded(child: Space(1), ),
+          RatingBar(
+            ignoreGestures: true,
+            onRatingUpdate: (value) {},
+            initialRating: overviewData.rating,
+            glowColor: Colors.transparent,
+            unratedColor: Color(0xffdadada),
+            minRating: 0,
+            direction: Axis.horizontal,
+            allowHalfRating: true,
+            itemPadding: EdgeInsets.zero,
+            itemCount: 5,
+            itemBuilder: (context, _) => Container(
+              width: 30 * MediaQuery.of(context).size.width / 540,
+              height: 30 * MediaQuery.of(context).size.width / 540,
+              child: Icon(
+                Icons.star,
+                color: Color(0xff424d97),
+              ),
+            )
+          ),
+          CustomText(overviewData.rating.toString() + '점', align: TextAlign.right, size: 16,),
         ],
       ),
     );
@@ -151,7 +175,7 @@ class OverviewPageState extends State<OverviewPage> {
                   FadeInOffset(
                     delayInMilisecond: 900,
                     offset: Offset(0, 30),
-                    child: rating,
+                    child: getRating(),
                   ),
                   contentSpace(0),
                   getContent('원제', overviewData.originalTitle, index: 0),
@@ -188,48 +212,16 @@ class OverviewPageState extends State<OverviewPage> {
       );
     }
 
-    getEpisode(AnimationEpisodeData data) {
-      return InkWell(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => EpisodePage(data),));
-        },
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.13,
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(child: CachedNetworkImage(imageUrl: data.thumbUrl, fit: BoxFit.fill,), width: MediaQuery.of(context).size.width * 0.3, height: (MediaQuery.of(context).size.width * 0.3) * 0.65),
-              Space(10),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 6),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Expanded(child: Space(1), flex: 1,),
-                    Container(height: 60, child: CustomText(data.title, align: TextAlign.left, size: 16,), constraints: new BoxConstraints(maxWidth: 300, maxHeight: 70)),
-                    CustomText(DateFormat('yyyy-MM-dd').format(data.uploadedAt), align: TextAlign.left,),
-                    Expanded(child: Space(1), flex: 1,),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     getEpisodes() {
       return Container(
-        height: overviewData.episodes.length * 140.0 + 30,
         padding: EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         width: double.infinity,
         decoration: roundBoxDecoration(),
         child: ListView.separated(
+          shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            return getEpisode(overviewData.episodes[index]);
+            return Ani24Episode(overviewData.episodes[index]);
           },
           separatorBuilder: (context, index) => Container(child: Divider(height: 1, thickness: 1, color: ani24_background_grey,),),
           itemCount: overviewData.episodes.length,

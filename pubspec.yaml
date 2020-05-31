@@ -1,5 +1,5 @@
 name: ani24
-description: A new Flutter project.
+description: Ani24 Flutter Project (For Personal Education).
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -33,6 +33,10 @@ dependencies:
   flutter_screenutil: ^1.1.0
   fluttertoast: ^4.0.1
   chewie: ^0.9.10
+  flutter_rating_bar: ^3.0.1+1
+  simple_animations: ^2.2.1
+  url_launcher: ^5.4.10
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

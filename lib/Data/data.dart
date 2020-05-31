@@ -6,8 +6,9 @@ class AnimationData {
   final String title;
   final String genre;
   final bool isUp;
+  final bool isBookMarked;
 
-  const AnimationData(this.thumbUrl, this.pageUrl, this.title, this.genre, [this.isUp = false]);
+  const AnimationData(this.thumbUrl, this.pageUrl, this.title, this.genre, [this.isUp = false, this.isBookMarked = false]);
 }
 
 // 애니메이션 개요 보기 페이지에 필요한 데이터 클래스
@@ -59,7 +60,7 @@ class AnimationOverview {
 class AnimationEpisodeData {
   final String thumbUrl;
   final String title;
-  final DateTime uploadedAt;
+  final String uploadedAt;
   final String pageUrl;
 
   const AnimationEpisodeData(this.thumbUrl, this.title, this.uploadedAt, this.pageUrl);
@@ -72,4 +73,24 @@ class EpisodeData {
   final String episodeId;
 
   const EpisodeData(this.title, this.viewInfo, this.episodeId);
+}
+
+// 애니메이션 리뷰 데이터
+class ReviewCommentData {
+  final String thumbUrl;
+  final String nickname;
+  final int rating;
+  final String body;
+  final DateTime uploadedDate;
+  final int likeCount;
+  final String likeUrl;
+
+  const ReviewCommentData(this.thumbUrl, this.nickname, this.rating, this.body, this.uploadedDate, this.likeCount, this.likeUrl);
+}
+
+// 애니메이션 검색 데이터
+class SearchData {
+  final String searchKeyword;
+
+  const SearchData(this.searchKeyword);
 }

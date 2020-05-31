@@ -1,11 +1,14 @@
 import 'package:ani24/Data/constants.dart';
 import 'package:ani24/Data/data.dart';
+import 'package:ani24/Screens/search.dart';
 import 'package:ani24/Widgets/texts.dart';
 import 'package:ani24/Widgets/widgets.dart';
 import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
@@ -25,10 +28,26 @@ class MainPageState extends State<MainPage> {
   List<List<dom.Element>> main_anis = List<List<dom.Element>>();
   List<List<AnimationData>> main_ani_infoes = List<List<AnimationData>>();
 
+  int _retryGetDataCount = 0;
+
+  bool isSearchMode = false;
+
+  TextEditingController _searchTextController = TextEditingController();
+
   getData() async {
     return memorizer.runOnce(() async {
       // 사이트 html을 긁어와 애니 목록을 가져옵니다.
-      http.Response response = await http.get(baseurl);
+      http.Response response;
+      while(response == null) {
+        try {
+          response = await http.get(baseurl);
+        }
+        catch (e) {
+          Fluttertoast.showToast(msg: '오류가 발생했습니다. 다시 시도합니다.');
+          if(_retryGetDataCount++ >= 5)
+            SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
+        }
+      }
       dom.Document document = parser.parse(response.body);
       List<dom.Element> main_ani_container = document.getElementsByClassName('main_ani_list');
       List<dom.Element> main_ani_lists = main_ani_container[0].children.where((element) => element.className.contains('main_ani_day_list')).toList();
@@ -92,8 +111,37 @@ class MainPageState extends State<MainPage> {
               return Scaffold(
                 resizeToAvoidBottomPadding: false,
                 appBar: AppBar(
+                  automaticallyImplyLeading: isSearchMode,
                   centerTitle: true,
                   backgroundColor: Colors.white,
+                  iconTheme: IconThemeData(color: ani24_text_black),
+                  leading: IconButton(
+                    icon: Icon(isSearchMode ? Icons.close : Icons.search),
+                    onPressed: () {
+                      setState(() {
+                        _searchTextController.text = '';
+                        isSearchMode = !isSearchMode;
+                      });
+                    },
+                  ),
+                  actions: <Widget>[
+                    if(isSearchMode)
+                      IconButton(
+                        icon: Icon(Icons.close, color: ani24_text_grey, size: 14,),
+                        onPressed: () {
+                          setState(() {
+                            _searchTextController.text = '';
+                          });
+                        },
+                      ),
+                    if(isSearchMode)
+                      IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(SearchData(_searchTextController.text)),));
+                        },
+                      ),
+                  ],
                   bottom: TabBar(
                     labelColor: ani24_text_blue,
                     unselectedLabelColor: ani24_text_black,
@@ -108,7 +156,7 @@ class MainPageState extends State<MainPage> {
                       buildTab("일"),
                     ],
                   ),
-                  title: Image.asset('assets/image/main_logo.png', width: 120, height: 30,),
+                  title: isSearchMode ? TextField(controller: _searchTextController, autofocus: true, onSubmitted: (value) => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(SearchData(_searchTextController.text)),)),) : Image.asset('assets/image/main_logo.png', width: 120, height: 30,),
                 ),
                 body: TabBarView(
                   children: <Widget>[

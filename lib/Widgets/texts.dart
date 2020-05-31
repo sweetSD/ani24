@@ -38,6 +38,7 @@ class CustomText extends StatelessWidget {
 
   final String data;
   final double size;
+  final double height;
   final TextStyle style;
   final TextType type;
   final TextAlign align;
@@ -53,8 +54,9 @@ class CustomText extends StatelessWidget {
   {
     this.type = TextType.Regular,
     this.size = 14,
+    this.height = 1,
     this.style = const TextStyle(), 
-    this.align, 
+    this.align = TextAlign.left, 
     this.direction, 
     this.overflow, 
     this.scaleFactor, 
@@ -66,7 +68,7 @@ class CustomText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(data,
-      style: style.copyWith(fontSize: size, fontWeight: getFontWeight(type), color: color, fontFamily: fontFamily),
+      style: style.copyWith(fontSize: size * MediaQuery.of(context).size.width / 540, fontWeight: getFontWeight(type), color: color, fontFamily: fontFamily, height: height),
       textAlign: align,
       textDirection: direction,
       overflow: overflow,
